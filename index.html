@@ -1,153 +1,308 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的个人导航站 · 摸鱼与开发</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: #0f172a; color: #f8fafc; padding: 30px 20px; min-height: 100vh; }
-        .container { max-width: 900px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 35px; }
-        header h1 { font-size: 28px; margin-bottom: 8px; font-weight: 700; }
-        header p { color: #94a3b8; font-size: 14px; }
-        
-        /* 分类与网格 */
-        .category { margin-bottom: 35px; }
-        .category-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-        
-        /* 导航卡片 */
-        .card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px 16px; text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px; transition: all 0.2s ease; backdrop-filter: blur(8px); }
-        .card:hover { transform: translateY(-3px); background: rgba(255, 255, 255, 0.1); border-color: #38bdf8; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-        .card-icon { font-size: 24px; min-width: 32px; text-align: center; }
-        .card-info { overflow: hidden; }
-        .card-name { font-size: 14px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-desc { font-size: 12px; color: #64748b; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
-        /* 搜索框 */
-        .search-box { display: flex; justify-content: center; margin-bottom: 30px; }
-        .search-input { width: 100%; max-width: 450px; padding: 12px 20px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: #fff; outline: none; font-size: 14px; transition: 0.2s; }
-        .search-input:focus { border-color: #38bdf8; background: rgba(255,255,255,0.1); }
-        
-        footer { text-align: center; margin-top: 50px; color: #475569; font-size: 13px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MY CYBER SHOWCASE</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #080811;
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* 背景 Canvas */
+    #canvas-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* 主内容居中 */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 80px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* 头部区域 */
+    .hero {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .avatar-wrapper {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      padding: 3px;
+      background: linear-gradient(135deg, #00f2fe, #4facfe, #000);
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.4);
+    }
+
+    .avatar-wrapper img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, #ffffff, #8be9fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+
+    .typewriter-box {
+      font-size: 1.2rem;
+      color: #00f2fe;
+      min-height: 30px;
+      font-family: monospace;
+    }
+
+    /* 毛玻璃卡片网格 */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      width: 100%;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(0, 242, 254, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 242, 254, 0.15);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .card-tag {
+      font-size: 0.75rem;
+      color: #00f2fe;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: #f1f2f6;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: #a4b0be;
+      line-height: 1.6;
+    }
+
+    /* 底部按钮栏 */
+    .links {
+      display: flex;
+      gap: 15px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      text-decoration: none;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 10px 24px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #00f2fe;
+      color: #080811;
+      font-weight: bold;
+      box-shadow: 0 0 15px #00f2fe;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🐱 个人导航站</h1>
-            <p>工作提效 · 摸鱼休闲 · 必备工具</p>
-        </header>
 
-        <!-- 聚合搜索 -->
-        <div class="search-box">
-            <input type="text" class="search-input" id="search" placeholder="输入搜索词，回车直接百度..." onkeydown="handleSearch(event)">
-        </div>
+  <!-- 背景粒子动画 -->
+  <canvas id="canvas-bg"></canvas>
 
-        <!-- 分类 1: 摸鱼专区 -->
-        <div class="category">
-            <div class="category-title">🎮 摸鱼专区</div>
-            <div class="grid">
-                <a href="https://www.bilibili.com" target="_blank" class="card">
-                    <div class="card-icon">📺</div>
-                    <div class="card-info">
-                        <div class="card-name">哔哩哔哩</div>
-                        <div class="card-desc">干杯～ ( ゜- ゜)つロ</div>
-                    </div>
-                </a>
-                <a href="https://v2ex.com" target="_blank" class="card">
-                    <div class="card-icon">💬</div>
-                    <div class="card-info">
-                        <div class="card-name">V2EX</div>
-                        <div class="card-desc">创意工作者社区</div>
-                    </div>
-                </a>
-                <a href="https://hackertyper.net" target="_blank" class="card">
-                    <div class="card-icon">⌨️</div>
-                    <div class="card-info">
-                        <div class="card-name">黑客打字机</div>
-                        <div class="card-desc">假装写代码摸鱼</div>
-                    </div>
-                </a>
-                <a href="https://weibo.com" target="_blank" class="card">
-                    <div class="card-icon">👁️</div>
-                    <div class="card-info">
-                        <div class="card-name">微博热搜</div>
-                        <div class="card-desc">吃瓜第一线</div>
-                    </div>
-                </a>
-            </div>
-        </div>
+  <div class="container">
+    <!-- 头部信息 -->
+    <header class="hero">
+      <div class="avatar-wrapper">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=CoolUser" alt="Avatar">
+      </div>
+      <h1>YOUR NAME</h1>
+      <div class="typewriter-box"><span id="typewriter"></span></div>
+    </header>
 
-        <!-- 分类 2: 常用开发与 AI -->
-        <div class="category">
-            <div class="category-title">🤖 AI 与开发工具</div>
-            <div class="grid">
-                <a href="https://github.com" target="_blank" class="card">
-                    <div class="card-icon">🐙</div>
-                    <div class="card-info">
-                        <div class="card-name">GitHub</div>
-                        <div class="card-desc">全球开源代码库</div>
-                    </div>
-                </a>
-                <a href="https://dash.cloudflare.com" target="_blank" class="card">
-                    <div class="card-icon">☁️</div>
-                    <div class="card-info">
-                        <div class="card-name">Cloudflare</div>
-                        <div class="card-desc">域名与 CDN 管理</div>
-                    </div>
-                </a>
-                <a href="https://chatgpt.com" target="_blank" class="card">
-                    <div class="card-icon">🧠</div>
-                    <div class="card-info">
-                        <div class="card-name">ChatGPT</div>
-                        <div class="card-desc">智能对话助手</div>
-                    </div>
-                </a>
-                <a href="https://gemini.google.com" target="_blank" class="card">
-                    <div class="card-icon">✨</div>
-                    <div class="card-info">
-                        <div class="card-name">Gemini</div>
-                        <div class="card-desc">Google AI 工具</div>
-                    </div>
-                </a>
-            </div>
-        </div>
+    <!-- 卡片展示区 -->
+    <main class="grid">
+      <div class="card">
+        <div class="card-tag">PROJECT 01</div>
+        <h3>数字造物计划</h3>
+        <p>探索前端视觉边界，利用 WebGL 与 Canvas 渲染赛博美学交互体验。</p>
+      </div>
 
-        <!-- 分类 3: 办公与效率 -->
-        <div class="category">
-            <div class="category-title">⚡ 办公与云盘</div>
-            <div class="grid">
-                <a href="https://docs.qq.com" target="_blank" class="card">
-                    <div class="card-icon">📑</div>
-                    <div class="card-info">
-                        <div class="card-name">腾讯文档</div>
-                        <div class="card-desc">在线协作表格/文档</div>
-                    </div>
-                </a>
-                <a href="https://pan.quark.cn" target="_blank" class="card">
-                    <div class="card-icon">📁</div>
-                    <div class="card-info">
-                        <div class="card-name">夸克网盘</div>
-                        <div class="card-desc">资料存储与分享</div>
-                    </div>
-                </a>
-            </div>
-        </div>
+      <div class="card">
+        <div class="card-tag">PROJECT 02</div>
+        <h3>代码实验室</h3>
+        <p>一些有趣的开源工具、动画实验以及未完成但充满野心的半成品。</p>
+      </div>
 
-        <footer>© 2026 maomi.site · 专属极简导航</footer>
-    </div>
+      <div class="card">
+        <div class="card-tag">STATUS</div>
+        <h3>当下状态</h3>
+        <p>正在探索独立开发、AI 工作流与极简设计。随时欢迎灵感碰撞。</p>
+      </div>
+    </main>
 
-    <script>
-        function handleSearch(e) {
-            if (e.key === 'Enter') {
-                const kw = document.getElementById('search').value.trim();
-                if (kw) {
-                    window.open('https://www.baidu.com/s?wd=' + encodeURIComponent(kw), '_blank');
-                }
-            }
+    <!-- 社交 / 外部链接 -->
+    <footer class="links">
+      <a href="https://github.com" target="_blank" class="btn">GitHub</a>
+      <a href="https://x.com" target="_blank" class="btn">Twitter / X</a>
+      <a href="mailto:your-email@example.com" class="btn">Email Me</a>
+    </footer>
+  </div>
+
+  <script>
+    // 1. 打字机特效
+    const words = ["Creative Explorer.", "Digital Nomad.", "Building the Future."];
+    let i = 0, timer;
+
+    function typingEffect() {
+      let word = words[i].split("");
+      var loopTyping = function() {
+        if (word.length > 0) {
+          document.getElementById('typewriter').innerHTML += word.shift();
+        } else {
+          setTimeout(deletingEffect, 2000);
+          return false;
         }
-    </script>
+        timer = setTimeout(loopTyping, 100);
+      };
+      loopTyping();
+    }
+
+    function deletingEffect() {
+      let word = words[i].split("");
+      var loopDeleting = function() {
+        if (word.length > 0) {
+          word.pop();
+          document.getElementById('typewriter').innerHTML = word.join("");
+        } else {
+          if (words.length > (i + 1)) { i++; } else { i = 0; }
+          setTimeout(typingEffect, 500);
+          return false;
+        }
+        timer = setTimeout(loopDeleting, 50);
+      };
+      loopDeleting();
+    }
+    typingEffect();
+
+    // 2. 粒子交互背景
+    const canvas = document.getElementById('canvas-bg');
+    const ctx = canvas.getContext('2d');
+    let width, height, particles;
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.8;
+        this.vy = (Math.random() - 0.5) * 0.8;
+        this.radius = Math.random() * 1.5 + 0.5;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > width) this.vx = -this.vx;
+        if (this.y < 0 || this.y > height) this.vy = -this.vy;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(0, 242, 254, 0.5)";
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const count = Math.floor(window.innerWidth / 15);
+      for (let i = 0; i < count; i++) {
+        particles.push(new Particle());
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+        for (let j = i + 1; j < particles.length; j++) {
+          const dist = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
+          if (dist < 100) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(0, 242, 254, ${0.15 * (1 - dist / 100)})`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', () => { resize(); initParticles(); });
+    resize();
+    initParticles();
+    animate();
+  </script>
 </body>
-</html>
+</html>1
