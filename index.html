@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CYBERSPACE // 3D MATRIX PORTFOLIO</title>
+  <title>CYBER NEXUS // 3D MATRIX PORTFOLIO</title>
   <style>
     :root {
       /* 默认暗黑赛博模式 */
@@ -66,14 +66,19 @@
       z-index: 0;
     }
 
-    /* 页面主体容器 */
+    /* 页面主体容器：设置为穿透，让鼠标能点到后面的 Canvas */
     .container {
       position: relative;
       z-index: 1;
       max-width: 1100px;
       margin: 0 auto;
       padding: 40px 24px 100px;
-      transition: opacity 2s ease;
+      pointer-events: none; /* 核心：让所有空白区域的点击穿透到 Canvas */
+    }
+
+    /* 恢复实际元素的点击响应 */
+    .nav, .hero-badge, .hero, .bento-card, .terminal-toggle, .terminal-window {
+      pointer-events: auto; 
     }
 
     /* 顶部控制栏 */
@@ -81,7 +86,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 40px;
+      margin-bottom: 20px;
       padding: 12px 24px;
       background: var(--card-bg);
       backdrop-filter: blur(16px);
@@ -125,14 +130,10 @@
       border-color: transparent;
     }
 
-    /* 英雄标语区 */
-    .hero {
+    /* 顶部小标签 */
+    .badge-wrapper {
       text-align: center;
-      margin-bottom: 60px;
-      /* 预留高度给背后的3D球体 */
-      padding-top: 40px; 
-      padding-bottom: 40px;
-      pointer-events: none; /* 让鼠标穿透文字去拨动后面的3D球 */
+      margin-top: 10px;
     }
 
     .hero-badge {
@@ -144,7 +145,18 @@
       color: var(--accent);
       font-size: 0.75rem;
       letter-spacing: 1px;
-      margin-bottom: 16px;
+    }
+
+    /* 为 3D 多面体保留的绝对 C 位 */
+    .spacer {
+      height: 380px;
+      width: 100%;
+    }
+
+    /* 英雄标语区 (大幅下沉) */
+    .hero {
+      text-align: center;
+      margin-bottom: 40px;
     }
 
     .hero h1 {
@@ -195,6 +207,7 @@
     @media (max-width: 768px) {
       .col-4, .col-6, .col-8, .col-12 { grid-column: span 12; }
       .hero h1 { font-size: 2.5rem; }
+      .spacer { height: 280px; }
     }
 
     .card-title {
@@ -343,7 +356,6 @@
       font-family: monospace;
     }
 
-    /* 强制终端不受白天模式影响，保持极客黑 */
     body.light-mode .terminal-window {
       background: rgba(5, 7, 14, 0.95);
       border-color: #38bdf8;
@@ -421,9 +433,16 @@
       </div>
     </header>
 
-    <!-- 标语 -->
-    <div class="hero">
+    <!-- 顶部最上方的独立小标签 -->
+    <div class="badge-wrapper">
       <div class="hero-badge">3D INTERACTIVE NODE</div>
+    </div>
+
+    <!-- 为 3D 多面体专门留出的物理大空间 -->
+    <div class="spacer"></div>
+
+    <!-- 标题与标语（被推到了多面体下方） -->
+    <div class="hero">
       <h1 id="hero-title">CYBER NEXUS</h1>
       <p>创造数字空间的视觉秩序与交互美学。</p>
     </div>
@@ -460,7 +479,7 @@
       <div class="bento-card col-4">
         <div class="card-title">EXPERIMENT</div>
         <h3 style="font-size: 1.1rem; margin-bottom: 6px;">3D 多面体物理</h3>
-        <p style="color: var(--text-dim); font-size: 0.85rem; line-height: 1.5;">在顶部标题空白处按住左键拖拽，可 360° 旋转背后的核心几何体。</p>
+        <p style="color: var(--text-dim); font-size: 0.85rem; line-height: 1.5;">鼠标在正上方的多面体区域内按住左键拖拽，即可 360° 旋转几何体。</p>
       </div>
 
       <div class="bento-card col-8 project-card">
@@ -501,7 +520,7 @@
 
   <script>
     /* ==========================================================
-       1. 纯 Web Audio 极客音效系统 (保留原样交互音)
+       1. 纯 Web Audio 极客音效系统
        ========================================================== */
     let audioCtx = null;
     let soundEnabled = false;
@@ -551,19 +570,22 @@
     });
 
     /* ==========================================================
-       3. 3D 浮动核心 + 持续曲率引擎粒子背景
+       3. 3D 浮动核心 + 真 3D 曲率引擎 (带平滑加速)
        ========================================================== */
     const canvas = document.getElementById('space-canvas');
     const ctx = canvas.getContext('2d');
-    let width, height;
+    let width, height, cx, cy;
 
     function resizeCanvas() {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
+      cx = width / 2;
+      cy = 280; // 多面体固定在上方专属留白区的中心点
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
+    // 3D 顶点生成
     const phi = (1 + Math.sqrt(5)) / 2;
     let baseVertices = [
       [-1,  phi, 0], [ 1,  phi, 0], [-1, -phi, 0], [ 1, -phi, 0],
@@ -571,10 +593,10 @@
       [ phi, 0, -1], [ phi, 0,  1], [-phi, 0, -1], [-phi, 0,  1]
     ];
     
-    // 归一化放大，稍大一点做背景效果更好
+    // 多面体大小
     baseVertices = baseVertices.map(v => {
       const len = Math.hypot(...v);
-      return [v[0]/len * 150, v[1]/len * 150, v[2]/len * 150];
+      return [v[0]/len * 140, v[1]/len * 140, v[2]/len * 140];
     });
 
     let edges = [];
@@ -585,16 +607,17 @@
           baseVertices[i][1] - baseVertices[j][1],
           baseVertices[i][2] - baseVertices[j][2]
         );
-        if (d < 180) edges.push([i, j]);
+        if (d < 170) edges.push([i, j]);
       }
     }
 
     let rotX = 0, rotY = 0;
     let isDragging = false, lastMouseX = 0, lastMouseY = 0;
 
+    // 【核心改进】仅在多面体周围一定半径内响应拖拽
     window.addEventListener('mousedown', (e) => {
-      // 允许在空白处或大标题区域触发拖拽
-      if (e.target === canvas || e.target === document.body || e.target.classList.contains('hero')) {
+      const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+      if (dist < 180) { // 半径 180 内为精准触控区
         isDragging = true;
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
@@ -613,94 +636,108 @@
     });
     window.addEventListener('mouseup', () => isDragging = false);
 
-    // 粒子系统与星穿逻辑
-    let particles = [];
-    let isWarping = false;
-    for (let i = 0; i < 150; i++) { // 增加粒子数量
-      particles.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        vx: (Math.random() - 0.5) * 1,
-        vy: (Math.random() - 0.5) * 1,
-        size: Math.random() * 2 + 0.5
-      });
+    // 【星空系统：3D 纵深】
+    class Star {
+      constructor() {
+        this.reset(true);
+      }
+      reset(initial = false) {
+        this.x = (Math.random() - 0.5) * 3000;
+        this.y = (Math.random() - 0.5) * 3000;
+        this.z = initial ? Math.random() * 2000 : 2000;
+        this.driftX = (Math.random() - 0.5) * 0.3;
+        this.driftY = (Math.random() - 0.5) * 0.3;
+        this.blinkTheta = Math.random() * Math.PI * 2;
+        this.blinkSpeed = Math.random() * 0.015 + 0.005;
+      }
     }
+
+    const stars = Array.from({length: 350}, () => new Star());
+    
+    // 引擎速度变量，用于平滑插值加速/减速
+    let currentWarpSpeed = 0.2; 
+    let targetWarpSpeed = 0.2;  
 
     const warpBtn = document.getElementById('warp-btn');
     warpBtn.addEventListener('click', () => {
-      isWarping = !isWarping;
-      warpBtn.innerHTML = isWarping ? '<span>🛑</span> 关闭引擎' : '<span>🚀</span> 曲率引擎';
-      if(isWarping) playSound(100, 'sawtooth', 0.5); 
+      const isWarping = targetWarpSpeed > 1;
+      targetWarpSpeed = isWarping ? 0.2 : 35; // 平滑加速目标值
+      warpBtn.innerHTML = isWarping ? '<span>🚀</span> 曲率引擎' : '<span>🛑</span> 关闭引擎';
+      if(!isWarping) playSound(100, 'sawtooth', 0.5); 
     });
 
     function render() {
-      // 在引擎模式下带拖尾，普通模式下完全清理
-      ctx.fillStyle = isWarping ? (document.body.classList.contains('light-mode') ? "rgba(248, 250, 252, 0.3)" : "rgba(5, 7, 14, 0.3)") : (document.body.classList.contains('light-mode') ? "rgba(248, 250, 252, 1)" : "rgba(5, 7, 14, 1)");
-      
+      // 画布清理
+      ctx.fillStyle = document.body.classList.contains('light-mode') ? "rgba(248, 250, 252, 1)" : "rgba(5, 7, 14, 1)";
       if(document.body.classList.contains('matrix-mode')) {
-        ctx.fillStyle = isWarping ? "rgba(2, 2, 2, 0.3)" : "rgba(2, 2, 2, 1)";
+        ctx.fillStyle = "rgba(2, 2, 2, 1)";
       }
-
+      // 如果处于极速状态，加入残影效果
+      if (currentWarpSpeed > 5) {
+         ctx.fillStyle = document.body.classList.contains('light-mode') ? "rgba(248, 250, 252, 0.4)" : "rgba(5, 7, 14, 0.4)";
+      }
       ctx.fillRect(0, 0, width, height);
 
-      // 粒子更新逻辑
-      particles.forEach(p => {
-        if (isWarping) {
-          // 向外发射逻辑
-          const dx = p.x - width / 2;
-          const dy = p.y - height / 2;
-          const dist = Math.hypot(dx, dy) || 1;
-          p.vx = (dx / dist) * 20; // 超高速
-          p.vy = (dy / dist) * 20;
-          
-          // 绘制光轨
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(p.x - p.vx * 2, p.y - p.vy * 2);
-          ctx.strokeStyle = document.body.classList.contains('matrix-mode') ? "#0f0" : "rgba(56, 189, 248, 0.8)";
-          ctx.lineWidth = 2;
-          ctx.stroke();
-        } else {
-          // 恢复正常漂浮阻力
-          p.vx *= 0.95;
-          p.vy *= 0.95;
-          p.vx += (Math.random() - 0.5) * 0.1;
-          p.vy += (Math.random() - 0.5) * 0.1;
-          
-          // 限制最大速度
-          const speed = Math.hypot(p.vx, p.vy);
-          if (speed > 1) { p.vx /= speed; p.vy /= speed; }
+      // 平滑加速/减速逻辑
+      currentWarpSpeed += (targetWarpSpeed - currentWarpSpeed) * 0.02;
 
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = document.body.classList.contains('matrix-mode') ? "#0f0" : "rgba(56, 189, 248, 0.4)";
-          ctx.fill();
+      // 渲染星空 (3D 纵深向屏幕中心扑来)
+      const fov = 400;
+      stars.forEach(star => {
+        star.z -= currentWarpSpeed;
+        
+        // 常态下加入缓慢微小的横向漂移
+        if (currentWarpSpeed < 2) {
+          star.x += star.driftX;
+          star.y += star.driftY;
         }
 
-        p.x += p.vx;
-        p.y += p.vy;
-        
-        // 边界处理
-        if (isWarping && (p.x < 0 || p.x > width || p.y < 0 || p.y > height)) {
-           p.x = width / 2 + (Math.random() - 0.5) * 20;
-           p.y = height / 2 + (Math.random() - 0.5) * 20;
-        } else if (!isWarping) {
-           if (p.x < 0) p.x = width;
-           if (p.x > width) p.x = 0;
-           if (p.y < 0) p.y = height;
-           if (p.y > height) p.y = 0;
+        if (star.z <= 1) star.reset();
+
+        const scale = fov / star.z;
+        const px = width / 2 + star.x * scale;
+        const py = height / 2 + star.y * scale;
+
+        // 呼吸闪烁
+        star.blinkTheta += star.blinkSpeed;
+        const alpha = Math.abs(Math.sin(star.blinkTheta)) * 0.6 + 0.2;
+
+        if (px >= 0 && px <= width && py >= 0 && py <= height) {
+          const size = Math.min(Math.max(scale * 1.5, 0.5), 8); // 限制大小
+          
+          ctx.beginPath();
+          ctx.arc(px, py, size, 0, Math.PI * 2);
+          
+          if (document.body.classList.contains('matrix-mode')) {
+            ctx.fillStyle = `rgba(0, 255, 0, ${alpha})`;
+          } else if (document.body.classList.contains('light-mode')) {
+            ctx.fillStyle = `rgba(100, 116, 139, ${alpha})`;
+          } else {
+            ctx.fillStyle = `rgba(56, 189, 248, ${alpha})`;
+          }
+          ctx.fill();
+
+          // 高速时光轨线 (真正的 3D 景深拉伸)
+          if (currentWarpSpeed > 10) {
+            const prevScale = fov / (star.z + currentWarpSpeed * 1.5);
+            const prevPx = width / 2 + star.x * prevScale;
+            const prevPy = height / 2 + star.y * prevScale;
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(prevPx, prevPy);
+            ctx.strokeStyle = ctx.fillStyle;
+            ctx.lineWidth = size * 0.8;
+            ctx.stroke();
+          }
         }
       });
 
       // 3D 核心投影渲染
       if (!isDragging) {
-        rotX += 0.003;
-        rotY += 0.005;
+        rotX += 0.002;
+        rotY += 0.004;
       }
 
-      const cx = width / 2;
-      const cy = 200; // 固定在顶部，位于 CYBER NEXUS 标题后方
-      const fov = 400;
       const matrixColor = document.body.classList.contains('matrix-mode') ? "#0f0" : "#c084fc";
       const matrixLine = document.body.classList.contains('matrix-mode') ? "rgba(0, 255, 0, 0.4)" : "rgba(56, 189, 248, 0.35)";
 
@@ -711,11 +748,7 @@
         let z2 = v[1] * Math.sin(rotX) + z1 * Math.cos(rotX);
 
         const scale = fov / (fov + z2 + 300);
-        return {
-          x: cx + x1 * scale,
-          y: cy + y2 * scale,
-          scale: scale
-        };
+        return { x: cx + x1 * scale, y: cy + y2 * scale, scale: scale };
       });
 
       ctx.strokeStyle = matrixLine;
@@ -775,7 +808,6 @@
     const termClose = document.getElementById('term-close');
     const termInput = document.getElementById('term-input');
     const termLogs = document.getElementById('term-logs');
-    const mainContainer = document.getElementById('main-container');
 
     function toggleTerminal() {
       const isVisible = termWindow.style.display === 'flex';
@@ -802,7 +834,6 @@
         termLogs.appendChild(row);
         termLogs.scrollTop = termLogs.scrollHeight;
         playSound(1000, 'square', 0.02);
-        // 模拟真实延迟
         await new Promise(r => setTimeout(r, 300 + Math.random() * 400));
       }
     }
@@ -811,7 +842,6 @@
       if (e.key === 'Enter') {
         const cmd = termInput.value.trim().toLowerCase();
         
-        // 打印用户输入的命令
         const row = document.createElement('div');
         row.innerHTML = `<span style="color: #fff">> ${termInput.value}</span>`;
         termLogs.appendChild(row);
@@ -831,30 +861,28 @@
             ? '进入黑客帝国视觉。' : '视觉已恢复正常。';
         } 
         else if (cmd === 'status') {
-          printStatus(); // 异步打印，不挂靠 reply
+          printStatus(); 
         } 
-        // ==== 暗线彩蛋 ====
+        // ==== 暗线彩蛋 (2731 新标签页静默开启) ====
         else if (cmd === '2731') {
           reply.style.color = '#10b981';
-          reply.innerText = '[ACCESS GRANTED] 通道已建立，即将跃迁...';
+          reply.innerText = '[ACCESS GRANTED] 通道已建立，正在跃迁...';
           setTimeout(() => {
-            window.location.href = '/2731';
-          }, 1500);
+            window.open('/2731', '_blank'); // 核心改动：开启新标签页
+          }, 1000);
         }
         else if (cmd === 'huimie') {
           reply.style.color = '#ef4444';
           reply.innerText = '[CRITICAL] 核心指令确认！自毁程序启动！';
           playSound(150, 'sawtooth', 2);
           
-          // 开启自毁动画
           setTimeout(() => {
-            document.querySelectorAll('.bento-card, .hero').forEach((el, index) => {
+            document.querySelectorAll('.bento-card, .hero, .badge-wrapper').forEach((el, index) => {
               setTimeout(() => {
                 el.classList.add('falling-debris');
                 playSound(100 + Math.random() * 300, 'square', 0.1);
               }, index * 200 + Math.random() * 300);
             });
-            // 3秒后全屏黑屏
             setTimeout(() => {
               document.body.innerHTML = '';
               document.body.style.backgroundColor = '#000';
@@ -865,7 +893,6 @@
           reply.innerText = `未识别指令: ${cmd}`;
         }
 
-        // 追加回复并滚动到底部
         if (cmd !== 'clear' && cmd !== 'status') {
           termLogs.appendChild(reply);
         }
