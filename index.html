@@ -6,6 +6,7 @@
   <title>CYBERSPACE // 3D MATRIX PORTFOLIO</title>
   <style>
     :root {
+      /* 默认暗黑赛博模式 */
       --bg: #05070e;
       --card-bg: rgba(15, 23, 42, 0.45);
       --card-border: rgba(56, 189, 248, 0.15);
@@ -14,6 +15,29 @@
       --accent-purple: #c084fc;
       --text: #f1f5f9;
       --text-dim: #94a3b8;
+    }
+
+    /* 🌞 白天极简模式 */
+    body.light-mode {
+      --bg: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.6);
+      --card-border: rgba(148, 163, 184, 0.4);
+      --accent: #0ea5e9;
+      --accent-glow: rgba(14, 165, 233, 0.3);
+      --accent-purple: #8b5cf6;
+      --text: #0f172a;
+      --text-dim: #475569;
+    }
+
+    /* 👾 黑客帝国视觉模式 */
+    body.matrix-mode {
+      --bg: #020202;
+      --card-bg: rgba(0, 20, 0, 0.8);
+      --card-border: rgba(0, 255, 0, 0.5);
+      --accent: #0f0;
+      --accent-glow: rgba(0, 255, 0, 0.6);
+      --text: #0f0;
+      --text-dim: #0a0;
     }
 
     * {
@@ -29,6 +53,7 @@
       min-height: 100vh;
       overflow-x: hidden;
       cursor: default;
+      transition: background-color 0.5s ease;
     }
 
     /* 3D 投影背景 Canvas */
@@ -48,6 +73,7 @@
       max-width: 1100px;
       margin: 0 auto;
       padding: 40px 24px 100px;
+      transition: opacity 2s ease;
     }
 
     /* 顶部控制栏 */
@@ -61,12 +87,13 @@
       backdrop-filter: blur(16px);
       border: 1px solid var(--card-border);
       border-radius: 100px;
+      transition: all 0.5s ease;
     }
 
     .brand {
       font-weight: 800;
       letter-spacing: 2px;
-      background: linear-gradient(90deg, #fff, var(--accent));
+      background: linear-gradient(90deg, var(--text), var(--accent));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       font-size: 0.95rem;
@@ -78,7 +105,7 @@
     }
 
     .ctrl-btn {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(128, 128, 128, 0.05);
       border: 1px solid var(--card-border);
       color: var(--text);
       padding: 6px 14px;
@@ -95,12 +122,17 @@
       background: var(--accent);
       color: #000;
       box-shadow: 0 0 12px var(--accent-glow);
+      border-color: transparent;
     }
 
     /* 英雄标语区 */
     .hero {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 60px;
+      /* 预留高度给背后的3D球体 */
+      padding-top: 40px; 
+      padding-bottom: 40px;
+      pointer-events: none; /* 让鼠标穿透文字去拨动后面的3D球 */
     }
 
     .hero-badge {
@@ -116,10 +148,11 @@
     }
 
     .hero h1 {
-      font-size: 3rem;
+      font-size: 4rem;
       font-weight: 900;
-      letter-spacing: -1px;
+      letter-spacing: 2px;
       margin-bottom: 12px;
+      text-shadow: 0 0 30px rgba(0,0,0,0.8);
     }
 
     .hero p {
@@ -146,12 +179,12 @@
       position: relative;
       overflow: hidden;
       transform-style: preserve-3d;
-      transition: border-color 0.3s, box-shadow 0.3s, transform 0.1s ease-out;
+      transition: border-color 0.3s, box-shadow 0.3s, transform 0.1s ease-out, background 0.5s;
     }
 
     .bento-card:hover {
-      border-color: rgba(56, 189, 248, 0.4);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.15);
+      border-color: var(--accent);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 0 0 20px var(--accent-glow);
     }
 
     .col-4 { grid-column: span 4; }
@@ -161,7 +194,7 @@
 
     @media (max-width: 768px) {
       .col-4, .col-6, .col-8, .col-12 { grid-column: span 12; }
-      .hero h1 { font-size: 2.2rem; }
+      .hero h1 { font-size: 2.5rem; }
     }
 
     .card-title {
@@ -236,7 +269,7 @@
     }
 
     .pill {
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(128, 128, 128, 0.04);
       border: 1px solid var(--card-border);
       padding: 6px 14px;
       border-radius: 12px;
@@ -248,7 +281,7 @@
 
     .pill:hover, .pill.active {
       background: var(--accent);
-      color: #000;
+      color: var(--bg);
       font-weight: bold;
       box-shadow: 0 0 10px var(--accent-glow);
     }
@@ -295,9 +328,9 @@
       position: fixed;
       bottom: 85px;
       right: 24px;
-      width: 360px;
+      width: 400px;
       max-width: calc(100vw - 48px);
-      height: 280px;
+      height: 320px;
       background: rgba(5, 7, 14, 0.92);
       backdrop-filter: blur(20px);
       border: 1px solid var(--accent);
@@ -310,6 +343,12 @@
       font-family: monospace;
     }
 
+    /* 强制终端不受白天模式影响，保持极客黑 */
+    body.light-mode .terminal-window {
+      background: rgba(5, 7, 14, 0.95);
+      border-color: #38bdf8;
+    }
+
     .terminal-header {
       background: rgba(255, 255, 255, 0.05);
       padding: 8px 12px;
@@ -317,7 +356,7 @@
       justify-content: space-between;
       align-items: center;
       font-size: 0.75rem;
-      color: var(--text-dim);
+      color: #94a3b8;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
@@ -325,7 +364,7 @@
       flex: 1;
       padding: 10px;
       overflow-y: auto;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: #38bdf8;
       display: flex;
       flex-direction: column;
@@ -340,8 +379,8 @@
     }
 
     .terminal-input-row span {
-      color: var(--accent);
-      font-size: 0.85rem;
+      color: #38bdf8;
+      font-size: 0.9rem;
     }
 
     .terminal-input {
@@ -351,7 +390,18 @@
       outline: none;
       color: #fff;
       font-family: monospace;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
+    }
+
+    /* 毁灭模式掉落动画 */
+    @keyframes fallApart {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(150vh) rotate(45deg); opacity: 0; }
+    }
+
+    .falling-debris {
+      animation: fallApart 1.5s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+      pointer-events: none;
     }
   </style>
 </head>
@@ -360,27 +410,27 @@
   <!-- 3D 几何投影与粒子背景 -->
   <canvas id="space-canvas"></canvas>
 
-  <div class="container">
+  <div class="container" id="main-container">
     <!-- 顶部导航栏 -->
     <header class="nav">
       <div class="brand">SYSTEM // SHOWCASE</div>
       <div class="controls">
         <button class="ctrl-btn" id="sound-btn"><span>🔇</span> 音效: 关</button>
-        <button class="ctrl-btn" id="explode-btn">💥 引力冲击</button>
+        <button class="ctrl-btn" id="theme-btn"><span>🌞</span> 昼夜切换</button>
+        <button class="ctrl-btn" id="warp-btn"><span>🚀</span> 曲率引擎</button>
       </div>
     </header>
 
     <!-- 标语 -->
     <div class="hero">
       <div class="hero-badge">3D INTERACTIVE NODE</div>
-      <h1 id="hero-title">YOUR NAME</h1>
+      <h1 id="hero-title">CYBER NEXUS</h1>
       <p>创造数字空间的视觉秩序与交互美学。</p>
     </div>
 
     <!-- Bento Grid 便当盒卡片组 -->
     <div class="bento-grid">
       
-      <!-- 实时状态卡片 -->
       <div class="bento-card col-4">
         <div class="card-title">
           <span>LOCAL NODE</span>
@@ -392,7 +442,6 @@
         </div>
       </div>
 
-      <!-- 动态音频/专注卡片 -->
       <div class="bento-card col-4">
         <div class="card-title">AUDIO FREQUENCY</div>
         <div style="font-size: 1.1rem; font-weight: bold; margin-top: 4px;">Cyber Flow Synth</div>
@@ -408,21 +457,18 @@
         </div>
       </div>
 
-      <!-- 核心理念卡片 -->
       <div class="bento-card col-4">
         <div class="card-title">EXPERIMENT</div>
         <h3 style="font-size: 1.1rem; margin-bottom: 6px;">3D 多面体物理</h3>
-        <p style="color: var(--text-dim); font-size: 0.85rem; line-height: 1.5;">按住鼠标左键在背景空白处拖拽，可直接 360° 旋转核心发光几何体。</p>
+        <p style="color: var(--text-dim); font-size: 0.85rem; line-height: 1.5;">在顶部标题空白处按住左键拖拽，可 360° 旋转背后的核心几何体。</p>
       </div>
 
-      <!-- 核心项目展示 -->
       <div class="bento-card col-8 project-card">
         <div class="card-title">FEATURED PROJECT</div>
         <h3>数字造物计划 // Genesis</h3>
         <p>探索无依赖纯前端架构下的极致渲染性能。使用原生 Canvas 与 WebGL 实现低延迟数学几何变换，打造身临其境的交互流。</p>
       </div>
 
-      <!-- 交互技能树 -->
       <div class="bento-card col-4">
         <div class="card-title">TECH STACK (CLICK ME)</div>
         <div class="skill-pills">
@@ -445,17 +491,17 @@
       <span style="cursor: pointer;" id="term-close">✕</span>
     </div>
     <div class="terminal-body" id="term-logs">
-      <div>> 连接就绪。输入 'help' 获取指令。</div>
+      <div>> 连接就绪。输入 help 获取指令。</div>
     </div>
     <div class="terminal-input-row">
       <span>></span>
-      <input type="text" class="terminal-input" id="term-input" autocomplete="off">
+      <input type="text" class="terminal-input" id="term-input" autocomplete="off" spellcheck="false">
     </div>
   </div>
 
   <script>
     /* ==========================================================
-       1. 纯 Web Audio 极客音效系统 (零外部文件)
+       1. 纯 Web Audio 极客音效系统 (保留原样交互音)
        ========================================================== */
     let audioCtx = null;
     let soundEnabled = false;
@@ -489,14 +535,23 @@
       if (soundEnabled) playSound(800, 'triangle', 0.1);
     });
 
-    // 绑定全局悬浮与点击音效
     document.querySelectorAll('.bento-card, .pill, .ctrl-btn, .terminal-toggle').forEach(el => {
       el.addEventListener('mouseenter', () => playSound(1200, 'sine', 0.02));
       el.addEventListener('click', () => playSound(400, 'triangle', 0.08));
     });
 
     /* ==========================================================
-       2. 3D 浮动低多边形核心 + 引力粒子背景
+       2. 昼夜主题切换
+       ========================================================== */
+    const themeBtn = document.getElementById('theme-btn');
+    themeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('light-mode');
+      const isLight = document.body.classList.contains('light-mode');
+      themeBtn.innerHTML = isLight ? '<span>🌙</span> 赛博暗黑' : '<span>🌞</span> 昼夜切换';
+    });
+
+    /* ==========================================================
+       3. 3D 浮动核心 + 持续曲率引擎粒子背景
        ========================================================== */
     const canvas = document.getElementById('space-canvas');
     const ctx = canvas.getContext('2d');
@@ -509,7 +564,6 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // 3D 顶点与边定义 (二十面体几何)
     const phi = (1 + Math.sqrt(5)) / 2;
     let baseVertices = [
       [-1,  phi, 0], [ 1,  phi, 0], [-1, -phi, 0], [ 1, -phi, 0],
@@ -517,10 +571,10 @@
       [ phi, 0, -1], [ phi, 0,  1], [-phi, 0, -1], [-phi, 0,  1]
     ];
     
-    // 归一化放大
+    // 归一化放大，稍大一点做背景效果更好
     baseVertices = baseVertices.map(v => {
       const len = Math.hypot(...v);
-      return [v[0]/len * 140, v[1]/len * 140, v[2]/len * 140];
+      return [v[0]/len * 150, v[1]/len * 150, v[2]/len * 150];
     });
 
     let edges = [];
@@ -531,16 +585,16 @@
           baseVertices[i][1] - baseVertices[j][1],
           baseVertices[i][2] - baseVertices[j][2]
         );
-        if (d < 160) edges.push([i, j]);
+        if (d < 180) edges.push([i, j]);
       }
     }
 
-    // 旋转与拖拽状态
     let rotX = 0, rotY = 0;
     let isDragging = false, lastMouseX = 0, lastMouseY = 0;
 
     window.addEventListener('mousedown', (e) => {
-      if (e.target === canvas || e.target === document.body) {
+      // 允许在空白处或大标题区域触发拖拽
+      if (e.target === canvas || e.target === document.body || e.target.classList.contains('hero')) {
         isDragging = true;
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
@@ -557,66 +611,102 @@
         lastMouseY = e.clientY;
       }
     });
-
     window.addEventListener('mouseup', () => isDragging = false);
 
-    // 散落粒子池
+    // 粒子系统与星穿逻辑
     let particles = [];
-    for (let i = 0; i < 70; i++) {
+    let isWarping = false;
+    for (let i = 0; i < 150; i++) { // 增加粒子数量
       particles.push({
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        size: Math.random() * 2 + 1
+        vx: (Math.random() - 0.5) * 1,
+        vy: (Math.random() - 0.5) * 1,
+        size: Math.random() * 2 + 0.5
       });
     }
 
-    function triggerExplosion() {
-      playSound(200, 'sawtooth', 0.3);
-      particles.forEach(p => {
-        p.vx = (Math.random() - 0.5) * 12;
-        p.vy = (Math.random() - 0.5) * 12;
-      });
-    }
-    document.getElementById('explode-btn').addEventListener('click', triggerExplosion);
+    const warpBtn = document.getElementById('warp-btn');
+    warpBtn.addEventListener('click', () => {
+      isWarping = !isWarping;
+      warpBtn.innerHTML = isWarping ? '<span>🛑</span> 关闭引擎' : '<span>🚀</span> 曲率引擎';
+      if(isWarping) playSound(100, 'sawtooth', 0.5); 
+    });
 
-    // 动画循环
     function render() {
-      ctx.clearRect(0, 0, width, height);
+      // 在引擎模式下带拖尾，普通模式下完全清理
+      ctx.fillStyle = isWarping ? (document.body.classList.contains('light-mode') ? "rgba(248, 250, 252, 0.3)" : "rgba(5, 7, 14, 0.3)") : (document.body.classList.contains('light-mode') ? "rgba(248, 250, 252, 1)" : "rgba(5, 7, 14, 1)");
+      
+      if(document.body.classList.contains('matrix-mode')) {
+        ctx.fillStyle = isWarping ? "rgba(2, 2, 2, 0.3)" : "rgba(2, 2, 2, 1)";
+      }
 
-      // 背景粒子
-      ctx.fillStyle = "rgba(56, 189, 248, 0.3)";
+      ctx.fillRect(0, 0, width, height);
+
+      // 粒子更新逻辑
       particles.forEach(p => {
+        if (isWarping) {
+          // 向外发射逻辑
+          const dx = p.x - width / 2;
+          const dy = p.y - height / 2;
+          const dist = Math.hypot(dx, dy) || 1;
+          p.vx = (dx / dist) * 20; // 超高速
+          p.vy = (dy / dist) * 20;
+          
+          // 绘制光轨
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x - p.vx * 2, p.y - p.vy * 2);
+          ctx.strokeStyle = document.body.classList.contains('matrix-mode') ? "#0f0" : "rgba(56, 189, 248, 0.8)";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        } else {
+          // 恢复正常漂浮阻力
+          p.vx *= 0.95;
+          p.vy *= 0.95;
+          p.vx += (Math.random() - 0.5) * 0.1;
+          p.vy += (Math.random() - 0.5) * 0.1;
+          
+          // 限制最大速度
+          const speed = Math.hypot(p.vx, p.vy);
+          if (speed > 1) { p.vx /= speed; p.vy /= speed; }
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = document.body.classList.contains('matrix-mode') ? "#0f0" : "rgba(56, 189, 248, 0.4)";
+          ctx.fill();
+        }
+
         p.x += p.vx;
         p.y += p.vy;
-        p.vx *= 0.98;
-        p.vy *= 0.98;
-        if (p.x < 0) p.x = width;
-        if (p.x > width) p.x = 0;
-        if (p.y < 0) p.y = height;
-        if (p.y > height) p.y = 0;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
+        
+        // 边界处理
+        if (isWarping && (p.x < 0 || p.x > width || p.y < 0 || p.y > height)) {
+           p.x = width / 2 + (Math.random() - 0.5) * 20;
+           p.y = height / 2 + (Math.random() - 0.5) * 20;
+        } else if (!isWarping) {
+           if (p.x < 0) p.x = width;
+           if (p.x > width) p.x = 0;
+           if (p.y < 0) p.y = height;
+           if (p.y > height) p.y = 0;
+        }
       });
 
-      // 自动旋转
+      // 3D 核心投影渲染
       if (!isDragging) {
         rotX += 0.003;
         rotY += 0.005;
       }
 
-      // 3D 核心投影渲染
       const cx = width / 2;
-      const cy = height * 0.45;
+      const cy = 200; // 固定在顶部，位于 CYBER NEXUS 标题后方
       const fov = 400;
+      const matrixColor = document.body.classList.contains('matrix-mode') ? "#0f0" : "#c084fc";
+      const matrixLine = document.body.classList.contains('matrix-mode') ? "rgba(0, 255, 0, 0.4)" : "rgba(56, 189, 248, 0.35)";
 
       const projected = baseVertices.map(v => {
-        // Y 轴旋转
         let x1 = v[0] * Math.cos(rotY) - v[2] * Math.sin(rotY);
         let z1 = v[0] * Math.sin(rotY) + v[2] * Math.cos(rotY);
-        // X 轴旋转
         let y2 = v[1] * Math.cos(rotX) - z1 * Math.sin(rotX);
         let z2 = v[1] * Math.sin(rotX) + z1 * Math.cos(rotX);
 
@@ -628,8 +718,7 @@
         };
       });
 
-      // 绘制 3D 边框线
-      ctx.strokeStyle = "rgba(56, 189, 248, 0.35)";
+      ctx.strokeStyle = matrixLine;
       ctx.lineWidth = 1.2;
       edges.forEach(([i, j]) => {
         ctx.beginPath();
@@ -638,15 +727,11 @@
         ctx.stroke();
       });
 
-      // 绘制 3D 发光顶点
       projected.forEach(p => {
         ctx.beginPath();
         ctx.arc(p.x, p.y, 3 * p.scale, 0, Math.PI * 2);
-        ctx.fillStyle = "#c084fc";
-        ctx.shadowColor = "#38bdf8";
-        ctx.shadowBlur = 10;
+        ctx.fillStyle = matrixColor;
         ctx.fill();
-        ctx.shadowBlur = 0;
       });
 
       requestAnimationFrame(render);
@@ -654,7 +739,7 @@
     render();
 
     /* ==========================================================
-       3. 3D 视差倾斜 (Card Tilt)
+       4. 3D 视差倾斜 & 实时时钟
        ========================================================== */
     document.querySelectorAll('.bento-card').forEach(card => {
       card.addEventListener('mousemove', (e) => {
@@ -668,9 +753,6 @@
       });
     });
 
-    /* ==========================================================
-       4. 实时时钟
-       ========================================================== */
     function updateClock() {
       const now = new Date();
       document.getElementById('local-clock').innerText = now.toTimeString().split(' ')[0];
@@ -678,9 +760,6 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    /* ==========================================================
-       5. 交互技能标签选择
-       ========================================================== */
     document.querySelectorAll('.pill').forEach(pill => {
       pill.addEventListener('click', () => {
         pill.classList.toggle('active');
@@ -689,13 +768,14 @@
     });
 
     /* ==========================================================
-       6. 极客控制台交互
+       5. 极客控制台交互 & 彩蛋系统
        ========================================================== */
     const termToggle = document.getElementById('term-toggle');
     const termWindow = document.getElementById('term-window');
     const termClose = document.getElementById('term-close');
     const termInput = document.getElementById('term-input');
     const termLogs = document.getElementById('term-logs');
+    const mainContainer = document.getElementById('main-container');
 
     function toggleTerminal() {
       const isVisible = termWindow.style.display === 'flex';
@@ -706,30 +786,89 @@
     termToggle.addEventListener('click', toggleTerminal);
     termClose.addEventListener('click', () => termWindow.style.display = 'none');
 
+    // 打字机系统状态模拟
+    async function printStatus() {
+      const lines = [
+        '[SYSTEM] 正在扫描本地节点...',
+        '[CPU] 量子核心运行中: 负载 12% [||........]',
+        '[MEM] 神经元内存分配: 16TB / 64TB',
+        '[NET] 卫星上行链路: 加密级别 AES-256 (延迟 12ms)',
+        '[NODE] CYBER_NEXUS 状态: 完美',
+        '[WARN] 侦测到未知生命体访问... 已放行。'
+      ];
+      for (let line of lines) {
+        const row = document.createElement('div');
+        row.innerText = line;
+        termLogs.appendChild(row);
+        termLogs.scrollTop = termLogs.scrollHeight;
+        playSound(1000, 'square', 0.02);
+        // 模拟真实延迟
+        await new Promise(r => setTimeout(r, 300 + Math.random() * 400));
+      }
+    }
+
     termInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         const cmd = termInput.value.trim().toLowerCase();
+        
+        // 打印用户输入的命令
         const row = document.createElement('div');
         row.innerHTML = `<span style="color: #fff">> ${termInput.value}</span>`;
         termLogs.appendChild(row);
 
         const reply = document.createElement('div');
+
+        // ==== 明线指令 ====
         if (cmd === 'help') {
-          reply.innerText = '可用指令: help, clear, explode, skills, about';
-        } else if (cmd === 'clear') {
+          reply.innerText = '可用指令: matrix, status, clear';
+        } 
+        else if (cmd === 'clear') {
           termLogs.innerHTML = '';
-        } else if (cmd === 'explode') {
-          triggerExplosion();
-          reply.innerText = '💥 冲击波已发射！';
-        } else if (cmd === 'skills') {
-          reply.innerText = '已加载模块: WebGL, TypeScript, CSS 3D Shader.';
-        } else if (cmd === 'about') {
-          reply.innerText = 'Cyber Portfolio v1.0. 纯静态零依赖单文件。';
-        } else {
+        } 
+        else if (cmd === 'matrix') {
+          document.body.classList.toggle('matrix-mode');
+          reply.innerText = document.body.classList.contains('matrix-mode') 
+            ? '进入黑客帝国视觉。' : '视觉已恢复正常。';
+        } 
+        else if (cmd === 'status') {
+          printStatus(); // 异步打印，不挂靠 reply
+        } 
+        // ==== 暗线彩蛋 ====
+        else if (cmd === '2731') {
+          reply.style.color = '#10b981';
+          reply.innerText = '[ACCESS GRANTED] 通道已建立，即将跃迁...';
+          setTimeout(() => {
+            window.location.href = '/2731';
+          }, 1500);
+        }
+        else if (cmd === 'huimie') {
+          reply.style.color = '#ef4444';
+          reply.innerText = '[CRITICAL] 核心指令确认！自毁程序启动！';
+          playSound(150, 'sawtooth', 2);
+          
+          // 开启自毁动画
+          setTimeout(() => {
+            document.querySelectorAll('.bento-card, .hero').forEach((el, index) => {
+              setTimeout(() => {
+                el.classList.add('falling-debris');
+                playSound(100 + Math.random() * 300, 'square', 0.1);
+              }, index * 200 + Math.random() * 300);
+            });
+            // 3秒后全屏黑屏
+            setTimeout(() => {
+              document.body.innerHTML = '';
+              document.body.style.backgroundColor = '#000';
+            }, 3500);
+          }, 500);
+        }
+        else {
           reply.innerText = `未识别指令: ${cmd}`;
         }
 
-        if (cmd !== 'clear') termLogs.appendChild(reply);
+        // 追加回复并滚动到底部
+        if (cmd !== 'clear' && cmd !== 'status') {
+          termLogs.appendChild(reply);
+        }
         termLogs.scrollTop = termLogs.scrollHeight;
         termInput.value = '';
         playSound(500, 'sine', 0.05);
