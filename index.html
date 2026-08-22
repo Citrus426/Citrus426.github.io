@@ -3,31 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的个人主页</title>
+    <title>我的个人导航站 · 摸鱼与开发</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: linear-gradient(135deg, #0f172a, #1e293b); color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 40px; max-width: 480px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-        .avatar { width: 90px; height: 90px; border-radius: 50%; background: #38bdf8; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
-        h1 { font-size: 24px; margin-bottom: 8px; }
-        p.bio { color: #94a3b8; font-size: 14px; margin-bottom: 24px; }
-        .links { display: flex; flex-direction: column; gap: 12px; }
-        .link-btn { display: block; padding: 12px 20px; background: rgba(255, 255, 255, 0.08); color: #f8fafc; text-decoration: none; border-radius: 10px; font-weight: 500; transition: 0.2s; border: 1px solid transparent; }
-        .link-btn:hover { background: #38bdf8; color: #0f172a; transform: translateY(-2px); font-weight: 600; }
-        .footer { margin-top: 30px; font-size: 12px; color: #64748b; }
+        body { background: #0f172a; color: #f8fafc; padding: 30px 20px; min-height: 100vh; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 35px; }
+        header h1 { font-size: 28px; margin-bottom: 8px; font-weight: 700; }
+        header p { color: #94a3b8; font-size: 14px; }
+        
+        /* 分类与网格 */
+        .category { margin-bottom: 35px; }
+        .category-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        
+        /* 导航卡片 */
+        .card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px 16px; text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px; transition: all 0.2s ease; backdrop-filter: blur(8px); }
+        .card:hover { transform: translateY(-3px); background: rgba(255, 255, 255, 0.1); border-color: #38bdf8; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+        .card-icon { font-size: 24px; min-width: 32px; text-align: center; }
+        .card-info { overflow: hidden; }
+        .card-name { font-size: 14px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-desc { font-size: 12px; color: #64748b; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* 搜索框 */
+        .search-box { display: flex; justify-content: center; margin-bottom: 30px; }
+        .search-input { width: 100%; max-width: 450px; padding: 12px 20px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: #fff; outline: none; font-size: 14px; transition: 0.2s; }
+        .search-input:focus { border-color: #38bdf8; background: rgba(255,255,255,0.1); }
+        
+        footer { text-align: center; margin-top: 50px; color: #475569; font-size: 13px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="avatar">🐱</div>
-        <h1>你好，我是网站主人 👋</h1>
-        <p class="bio">欢迎来到我的个人主页，记录生活与技术。</p>
-        <div class="links">
-            <a href="https://github.com" target="_blank" class="link-btn">📌 我的 GitHub</a>
-            <a href="mailto:your-email@example.com" class="link-btn">📫 发送邮件联系我</a>
-            <a href="#" class="link-btn">🎮 正在玩的游戏 / 爱好</a>
+    <div class="container">
+        <header>
+            <h1>🐱 个人导航站</h1>
+            <p>工作提效 · 摸鱼休闲 · 必备工具</p>
+        </header>
+
+        <!-- 聚合搜索 -->
+        <div class="search-box">
+            <input type="text" class="search-input" id="search" placeholder="输入搜索词，回车直接百度..." onkeydown="handleSearch(event)">
         </div>
-        <div class="footer">© 2026 maomi.site · 保持热爱</div>
+
+        <!-- 分类 1: 摸鱼专区 -->
+        <div class="category">
+            <div class="category-title">🎮 摸鱼专区</div>
+            <div class="grid">
+                <a href="https://www.bilibili.com" target="_blank" class="card">
+                    <div class="card-icon">📺</div>
+                    <div class="card-info">
+                        <div class="card-name">哔哩哔哩</div>
+                        <div class="card-desc">干杯～ ( ゜- ゜)つロ</div>
+                    </div>
+                </a>
+                <a href="https://v2ex.com" target="_blank" class="card">
+                    <div class="card-icon">💬</div>
+                    <div class="card-info">
+                        <div class="card-name">V2EX</div>
+                        <div class="card-desc">创意工作者社区</div>
+                    </div>
+                </a>
+                <a href="https://hackertyper.net" target="_blank" class="card">
+                    <div class="card-icon">⌨️</div>
+                    <div class="card-info">
+                        <div class="card-name">黑客打字机</div>
+                        <div class="card-desc">假装写代码摸鱼</div>
+                    </div>
+                </a>
+                <a href="https://weibo.com" target="_blank" class="card">
+                    <div class="card-icon">👁️</div>
+                    <div class="card-info">
+                        <div class="card-name">微博热搜</div>
+                        <div class="card-desc">吃瓜第一线</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 分类 2: 常用开发与 AI -->
+        <div class="category">
+            <div class="category-title">🤖 AI 与开发工具</div>
+            <div class="grid">
+                <a href="https://github.com" target="_blank" class="card">
+                    <div class="card-icon">🐙</div>
+                    <div class="card-info">
+                        <div class="card-name">GitHub</div>
+                        <div class="card-desc">全球开源代码库</div>
+                    </div>
+                </a>
+                <a href="https://dash.cloudflare.com" target="_blank" class="card">
+                    <div class="card-icon">☁️</div>
+                    <div class="card-info">
+                        <div class="card-name">Cloudflare</div>
+                        <div class="card-desc">域名与 CDN 管理</div>
+                    </div>
+                </a>
+                <a href="https://chatgpt.com" target="_blank" class="card">
+                    <div class="card-icon">🧠</div>
+                    <div class="card-info">
+                        <div class="card-name">ChatGPT</div>
+                        <div class="card-desc">智能对话助手</div>
+                    </div>
+                </a>
+                <a href="https://gemini.google.com" target="_blank" class="card">
+                    <div class="card-icon">✨</div>
+                    <div class="card-info">
+                        <div class="card-name">Gemini</div>
+                        <div class="card-desc">Google AI 工具</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 分类 3: 办公与效率 -->
+        <div class="category">
+            <div class="category-title">⚡ 办公与云盘</div>
+            <div class="grid">
+                <a href="https://docs.qq.com" target="_blank" class="card">
+                    <div class="card-icon">📑</div>
+                    <div class="card-info">
+                        <div class="card-name">腾讯文档</div>
+                        <div class="card-desc">在线协作表格/文档</div>
+                    </div>
+                </a>
+                <a href="https://pan.quark.cn" target="_blank" class="card">
+                    <div class="card-icon">📁</div>
+                    <div class="card-info">
+                        <div class="card-name">夸克网盘</div>
+                        <div class="card-desc">资料存储与分享</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <footer>© 2026 maomi.site · 专属极简导航</footer>
     </div>
+
+    <script>
+        function handleSearch(e) {
+            if (e.key === 'Enter') {
+                const kw = document.getElementById('search').value.trim();
+                if (kw) {
+                    window.open('https://www.baidu.com/s?wd=' + encodeURIComponent(kw), '_blank');
+                }
+            }
+        }
+    </script>
 </body>
 </html>
