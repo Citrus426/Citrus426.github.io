@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#121212">
+  <meta name="description"
+        content="留白 STILLS 摄影作品集。记录自然的人像、远方的风景，以及有温度的品牌故事。">
+  <title>留白 STILLS — 让瞬间，有处停留</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #121212;
+      --surface: #1b1b1b;
+      --surface-2: #222222;
+      --text: #ededed;
+      --muted: #aaa8a3;
+      --accent: #ff5a1f;
+      --line: #343434;
+      --error: #ffb3a5;
+      --radius: 20px;
+      --max: 1200px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 100px;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    body.modal-open { overflow: hidden; }
+    button, input, select, textarea { font: inherit; }
+    button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+    button, a { touch-action: manipulation; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .55; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    button { color: inherit; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { line-height: 1.15; }
+    ::selection { background: var(--accent); color: #101010; }
+    :focus-visible { outline: 3px solid #ffb295; outline-offset: 5px; }
+    [hidden] { display: none !important; }
+
+    .container {
+      width: min(var(--max), calc(100% - 64px));
+      margin-inline: auto;
+    }
+    .section { padding-block: 100px; scroll-margin-top: 24px; }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+    .muted { color: var(--muted); }
+    .accent { color: var(--accent); }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .skip-link {
+      position: fixed;
+      left: 16px;
+      top: -100px;
+      padding: 12px 18px;
+      background: var(--accent);
+      color: #111;
+      z-index: 100;
+    }
+    .skip-link:focus { top: 12px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      min-height: 48px;
+      padding: 13px 22px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #16100d;
+      font-weight: 700;
+      transition: background .2s, transform .2s, border-color .2s;
+    }
+    .btn:hover:not(:disabled) {
+      background: #ff7848;
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border-color: #606060;
+    }
+    .btn-secondary:hover:not(:disabled) { background: #292929; }
+    .icon-btn {
+      display: inline-grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 1px solid #666;
+      border-radius: 50%;
+      color: white;
+      background: #171717;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover { background: #353535; }
+
+    /* Navigation */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      border-bottom: 1px solid #ffffff12;
+      background: #121212ed;
+      backdrop-filter: blur(18px);
+    }
+    .header-inner {
+      min-height: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+    .logo { display: flex; align-items: baseline; gap: 12px; white-space: nowrap; }
+    .logo strong { font-size: 24px; letter-spacing: -.07em; }
+    .logo span { color: var(--muted); font-size: 11px; letter-spacing: .18em; }
+    .nav { display: flex; align-items: center; gap: 30px; }
+    .nav > a { color: #c4c2be; font-size: 14px; }
+    .nav > a:hover { color: white; }
+    .nav > .nav-cta {
+      border: 1px solid #555;
+      border-radius: 999px;
+      padding: 9px 18px;
+      color: var(--text);
+    }
+    .menu-toggle { display: none; }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      min-height: min(830px, calc(100svh - 80px));
+      display: grid;
+      align-items: center;
+      isolation: isolate;
+      background: #32342f;
+      overflow: hidden;
+    }
+    .hero-images, .hero-shade, .hero-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .hero-images { z-index: -3; }
+    .hero-image {
+      object-fit: cover;
+      object-position: center 45%;
+      opacity: 0;
+      transition: opacity 1.4s ease;
+    }
+    .hero-image.active { opacity: 1; }
+    .hero-shade {
+      z-index: -2;
+      background: linear-gradient(90deg, #080b0be0 0%, #080b0b65 65%, #080b0b20),
+                  linear-gradient(0deg, #121212 0%, transparent 40%);
+    }
+    .hero-content { padding-block: 100px 145px; }
+    .hero .eyebrow { color: #d0cec8; }
+    .hero h1 {
+      font-size: clamp(52px, 7.7vw, 106px);
+      font-weight: 500;
+      letter-spacing: -.075em;
+      margin-bottom: 30px;
+      max-width: 900px;
+    }
+    .hero h1 span { color: #d2c6b0; }
+    .hero-description {
+      max-width: 420px;
+      color: #ceccc6;
+      font-size: 16px;
+      line-height: 1.9;
+      margin-bottom: 32px;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .hero-bottom {
+      position: absolute;
+      bottom: 32px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    .hero-caption { font-size: 11px; color: #bdbcb6; letter-spacing: .12em; }
+    .slideshow-controls { display: flex; align-items: center; gap: 8px; }
+    .slide-dot {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 12px;
+      border: 0;
+      background: transparent;
+    }
+    .slide-dot::after {
+      display: block;
+      content: "";
+      width: 20px;
+      height: 3px;
+      background: #777;
+      transition: background .2s;
+    }
+    .slide-dot[aria-pressed="true"]::after { background: var(--accent); }
+    .pause-btn { font-size: 12px; width: 48px; height: 44px; border-radius: 8px; }
+
+    /* Intro and portfolio */
+    .intro {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      align-items: center;
+      gap: 64px;
+      padding-block: 42px;
+      border-bottom: 1px solid var(--line);
+    }
+    .intro p { margin-bottom: 0; max-width: 620px; font-size: 18px; }
+    .intro-meta {
+      display: flex;
+      justify-content: flex-end;
+      gap: 32px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .intro-meta strong { display: block; color: var(--text); font-size: 22px; font-weight: 500; }
+    .section-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 36px;
+    }
+    .section-heading h2, .booking-copy h2 {
+      font-size: clamp(34px, 4.8vw, 60px);
+      font-weight: 500;
+      letter-spacing: -.05em;
+      margin-bottom: 0;
+    }
+    .section-heading p { margin: 0; max-width: 330px; font-size: 14px; }
+    .filter-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; }
+    .filter {
+      min-height: 44px;
+      padding: 9px 19px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      transition: background .2s, color .2s;
+    }
+    .filter:hover { border-color: #888; color: var(--text); }
+    .filter[aria-pressed="true"] {
+      background: var(--text);
+      border-color: var(--text);
+      color: #121212;
+    }
+    .work-count { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+    .work-card {
+      position: relative;
+      display: block;
+      width: 100%;
+      min-height: 340px;
+      padding: 0;
+      text-align: left;
+      overflow: hidden;
+      border: 1px solid #ffffff10;
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, #48504b, #292621);
+      isolation: isolate;
+    }
+    .work-card.featured { grid-column: span 2; }
+    .work-card img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+      transition: transform .65s cubic-bezier(.2,.7,.2,1);
+    }
+    .work-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, #000d, #0000 68%);
+      z-index: -1;
+    }
+    .work-card:hover img, .work-card:focus-visible img { transform: scale(1.045); }
+    .work-card:hover .work-arrow { background: var(--accent); color: #111; }
+    .work-info { position: absolute; left: 24px; right: 24px; bottom: 24px; }
+    .work-category { color: #ddd4c7; font-size: 11px; letter-spacing: .12em; }
+    .work-title { display: block; font-size: 25px; margin-block: 7px 4px; }
+    .work-meta { display: block; color: #d1cdc5; font-size: 12px; padding-right: 48px; }
+    .work-arrow {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #ffffff65;
+      border-radius: 50%;
+      transition: background .2s, color .2s;
+      font-size: 20px;
+    }
+    .portfolio-note { margin: 20px 0 0; color: var(--muted); font-size: 12px; }
+
+    /* Approach */
+    .approach {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 18px;
+      margin-top: 52px;
+    }
+    .approach article {
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .step-number { color: var(--accent); font-size: 12px; }
+    .approach h3 { margin: 24px 0 12px; font-size: 20px; font-weight: 500; }
+    .approach p { font-size: 14px; margin-bottom: 0; color: var(--muted); }
+
+    /* Booking */
+    .booking-section {
+      background: #181818;
+      border-block: 1px solid #ffffff0c;
+    }
+    .booking-grid {
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      align-items: start;
+      gap: 80px;
+    }
+    .booking-copy > p { color: var(--muted); max-width: 390px; margin-block: 28px; }
+    .availability {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: #242822;
+      border: 1px solid #48543f;
+      border-radius: 999px;
+      color: #c6dbb5;
+      font-size: 12px;
+    }
+    .availability::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: #bdd8a7;
+      border-radius: 50%;
+    }
+    .service-list { margin-top: 32px; }
+    .service-item {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 20px;
+      padding-block: 17px;
+      border-bottom: 1px solid var(--line);
+    }
+    .service-item strong { font-weight: 500; font-size: 15px; }
+    .service-item span { color: var(--muted); font-size: 13px; white-space: nowrap; }
+    .small-note { color: var(--muted); font-size: 12px; line-height: 1.8; }
+
+    .form-card {
+      padding: 32px;
+      background: var(--surface-2);
+      border: 1px solid #ffffff0c;
+      border-radius: 24px;
+    }
+    .form-card h3 { font-size: 23px; font-weight: 500; margin-bottom: 10px; }
+    .form-intro { font-size: 13px; color: var(--muted); margin-bottom: 26px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .field { min-width: 0; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { display: block; margin-bottom: 8px; font-size: 13px; }
+    .required { color: #ffad8f; }
+    input:not([type="checkbox"]), select, textarea {
+      width: 100%;
+      min-width: 0;
+      min-height: 48px;
+      padding: 12px 13px;
+      border: 1px solid #505050;
+      border-radius: 10px;
+      background: #191919;
+      color: var(--text);
+      transition: border-color .2s;
+    }
+    input::placeholder, textarea::placeholder { color: #92908d; opacity: 1; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    input[aria-invalid="true"], select[aria-invalid="true"],
+    textarea[aria-invalid="true"] { border-color: var(--error); }
+    textarea { resize: vertical; min-height: 108px; }
+    input[type="date"] { min-height: 50px; }
+    .field-error {
+      color: var(--error);
+      font-size: 12px;
+      margin: 6px 0 0;
+    }
+    .field-error:empty { display: none; }
+    .field-hint { margin: 7px 0 0; font-size: 11px; color: var(--muted); }
+    .consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 12px;
+      color: #c6c3bd;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    .consent input {
+      width: 18px;
+      height: 18px;
+      margin: 3px 0 0;
+      flex-shrink: 0;
+      accent-color: var(--accent);
+    }
+    .submit-btn { width: 100%; margin-top: 22px; }
+    .form-result {
+      margin-top: 18px;
+      padding: 15px;
+      border: 1px solid #53684a;
+      border-radius: 12px;
+      background: #253020;
+      color: #d6e8cd;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+    .form-result:empty { display: none; }
+    .form-result.is-error {
+      border-color: #945e54;
+      background: #352621;
+      color: #ffd2c6;
+    }
+
+    /* Reviews / FAQ */
+    .stories-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 70px;
+    }
+    .column-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .column-title h3 { font-size: 25px; font-weight: 500; margin: 0; }
+    .column-title span { color: var(--muted); font-size: 12px; }
+    details { border-bottom: 1px solid var(--line); }
+    summary {
+      list-style: none;
+      position: relative;
+      cursor: pointer;
+      padding: 22px 35px 22px 0;
+      font-size: 15px;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after {
+      content: "+";
+      position: absolute;
+      right: 4px;
+      top: 19px;
+      color: var(--muted);
+      font-size: 22px;
+    }
+    details[open] summary::after { content: "−"; color: var(--accent); }
+    .detail-content { padding-bottom: 24px; color: var(--muted); font-size: 14px; }
+    .detail-content p:last-child { margin-bottom: 0; }
+    .stars { color: #ff9d76; letter-spacing: 3px; margin-bottom: 12px; }
+    blockquote { margin: 0; line-height: 1.9; }
+    .review-author { display: block; margin-top: 14px; font-size: 12px; color: #dedad2; }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--line); padding-block: 60px 28px; }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 70px;
+      padding-bottom: 45px;
+    }
+    .footer-tagline { color: var(--muted); margin: 18px 0; font-size: 14px; }
+    .social-links { display: flex; flex-wrap: wrap; gap: 22px; font-size: 13px; }
+    .social-links a { padding-block: 6px; border-bottom: 1px solid #555; }
+    .newsletter-label { display: block; font-size: 17px; margin-bottom: 8px; }
+    .newsletter-row { display: flex; gap: 10px; margin-top: 16px; }
+    .newsletter-row .btn { flex-shrink: 0; border-radius: 10px; }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .footer-bottom a { text-decoration: underline; text-underline-offset: 4px; }
+
+    /* Lightbox */
+    dialog {
+      width: min(1060px, calc(100% - 32px));
+      max-height: 92svh;
+      padding: 0;
+      border: 1px solid #555;
+      border-radius: 18px;
+      background: #191919;
+      color: var(--text);
+      overflow: auto;
+      box-shadow: 0 30px 100px #0009;
+    }
+    dialog::backdrop { background: #000d; backdrop-filter: blur(8px); }
+    .dialog-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      padding: 15px 20px;
+    }
+    .dialog-counter { color: var(--muted); font-size: 13px; margin: 0; }
+    .dialog-visual {
+      min-height: 220px;
+      background: linear-gradient(145deg, #465149, #262826);
+      display: grid;
+      place-items: center;
+    }
+    .dialog-visual img { max-height: 58svh; width: 100%; object-fit: contain; }
+    .image-unavailable { margin: 0; padding: 50px 20px; color: #d4d8d0; text-align: center; }
+    .dialog-info { padding: 24px; }
+    .dialog-info h2 { margin: 0 0 12px; font-size: 28px; }
+    .dialog-info p { color: var(--muted); margin: 0; font-size: 14px; }
+    .dialog-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 0 24px 24px;
+    }
+    .dialog-nav { display: flex; gap: 8px; }
+
+    /* Reveal is enabled only after JS confirms IntersectionObserver support. */
+    .reveal-enabled .reveal:not(.is-visible) {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .reveal {
+      transition: opacity .65s ease, transform .65s ease;
+    }
+
+    @media (max-width: 1000px) {
+      .booking-grid { gap: 36px; }
+      .stories-grid { gap: 36px; }
+      .work-card { min-height: 300px; }
+      .form-card { padding: 24px; }
+      .nav { gap: 22px; }
+    }
+
+    @media (max-width: 760px) {
+      .container { width: calc(100% - 40px); }
+      .section { padding-block: 68px; }
+      .header-inner { min-height: 70px; }
+      .menu-toggle { display: inline-grid; border-radius: 12px; }
+      .nav {
+        display: none;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        right: 0;
+        padding: 20px;
+        background: #181818;
+        border-bottom: 1px solid #444;
+        box-shadow: 0 20px 30px #0005;
+      }
+      .nav.is-open { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
+      .nav > a { display: block; padding: 14px; }
+      .nav > .nav-cta { margin-top: 8px; text-align: center; }
+      .hero { min-height: 680px; }
+      .hero-content { padding-block: 80px 140px; }
+      .hero h1 { font-size: clamp(48px, 10vw, 75px); }
+      .hero-description { font-size: 14px; max-width: 330px; }
+      .hero-shade { background: linear-gradient(90deg, #080b0bd9, #080b0b55),
+                                          linear-gradient(0deg, #121212, transparent 65%); }
+      .hero-caption { max-width: 155px; font-size: 10px; }
+      .hero-bottom { bottom: 25px; gap: 10px; }
+      .slideshow-controls { gap: 0; }
+      .intro { grid-template-columns: 1fr; gap: 26px; padding-block: 32px; }
+      .intro p { font-size: 16px; }
+      .intro-meta { justify-content: flex-start; gap: 40px; }
+      .section-heading { align-items: flex-start; flex-direction: column; gap: 18px; }
+      .portfolio-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+      .work-card { min-height: 300px; }
+      .work-card.featured { grid-column: span 2; }
+      .work-info { left: 18px; right: 18px; bottom: 20px; }
+      .work-title { font-size: 22px; }
+      .work-meta { font-size: 11px; }
+      .approach { grid-template-columns: 1fr; gap: 12px; margin-top: 34px; }
+      .approach article { padding: 24px; }
+      .approach h3 { margin-top: 14px; }
+      .booking-grid, .stories-grid, .footer-top { grid-template-columns: 1fr; gap: 44px; }
+      .booking-copy > p { max-width: none; }
+      .service-list { margin-top: 22px; }
+      .footer-top { gap: 38px; }
+    }
+
+    @media (max-width: 460px) {
+      .logo span { font-size: 10px; }
+      .hero { min-height: 650px; }
+      .hero-actions .btn { padding-inline: 18px; gap: 12px; font-size: 14px; }
+      .filter-row { align-items: flex-start; flex-direction: column; gap: 12px; }
+      .filter { padding-inline: 17px; }
+      .portfolio-grid { grid-template-columns: 1fr; }
+      .work-card.featured { grid-column: auto; }
+      .work-card { min-height: 350px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-card { padding: 22px 18px; }
+      .newsletter-row { flex-direction: column; }
+      .dialog-bottom { align-items: stretch; flex-direction: column; }
+      .dialog-nav { justify-content: space-between; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+      .reveal-enabled .reveal:not(.is-visible) { opacity: 1; transform: none; }
+      .work-card:hover img, .btn:hover:not(:disabled) { transform: none; }
+    }
+  </style>
+</head>
+
+<body id="top">
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="#top" aria-label="留白 STILLS 首页">
+        <strong>留白<span class="accent">.</span></strong>
+        <span>STILLS STUDIO</span>
+      </a>
+
+      <button class="icon-btn menu-toggle" id="menu-toggle"
+              type="button" aria-expanded="false" aria-controls="main-nav"
+              aria-label="打开导航">
+        <span aria-hidden="true">☰</span>
+      </button>
+
+      <nav class="nav" id="main-nav" aria-label="主导航">
+        <a href="#work">精选作品</a>
+        <a href="#approach">拍摄方式</a>
+        <a href="#stories">客户声音</a>
+        <a class="nav-cta" href="#booking">预约拍摄 ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title"
+             aria-roledescription="轮播">
+      <div class="hero-images" aria-hidden="true">
+        <img class="hero-image active"
+             src="https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=2000&q=85"
+             alt="" fetchpriority="high">
+        <img class="hero-image"
+             src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2000&q=85"
+             alt="" loading="lazy">
+        <img class="hero-image"
+             src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2000&q=85"
+             alt="" loading="lazy">
+      </div>
+      <div class="hero-shade" aria-hidden="true"></div>
+
+      <div class="container hero-content">
+        <p class="eyebrow">Independent photography · Hangzhou</p>
+        <h1 id="hero-title">让瞬间，<br>有处<span>停留。</span></h1>
+        <p class="hero-description">
+          不必刻意成为谁。<br>
+          在自然光与真实情绪之间，<br>
+          留下属于你的、不被复制的一帧。
+        </p>
+        <div class="hero-actions">
+          <a class="btn" href="#work">探索作品 <span aria-hidden="true">↗</span></a>
+          <a class="btn btn-secondary" href="#booking">聊聊你的拍摄</a>
+        </div>
+      </div>
+
+      <div class="container hero-bottom">
+        <span class="hero-caption" id="hero-caption">01 / 静谧原野 · THE QUIET WILD</span>
+        <div class="slideshow-controls" aria-label="背景轮播控制">
+          <button class="slide-dot" type="button" aria-label="显示静谧原野"
+                  aria-pressed="true" data-slide="0"></button>
+          <button class="slide-dot" type="button" aria-label="显示山的另一边"
+                  aria-pressed="false" data-slide="1"></button>
+          <button class="slide-dot" type="button" aria-label="显示林间来信"
+                  aria-pressed="false" data-slide="2"></button>
+          <button class="icon-btn pause-btn" id="pause-slides" type="button"
+                  aria-label="暂停背景轮播">暂停</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="container intro reveal">
+      <p>比起完美的姿势，<br>我更在意你放松下来后的那个表情。</p>
+      <div class="intro-meta">
+        <div><strong>自然光</strong>让真实自然发生</div>
+        <div><strong>慢拍摄</strong>给情绪一点时间</div>
+        <div><strong>杭州</strong>也去你所在的城市</div>
+      </div>
+    </div>
+
+    <section class="section container" id="work" aria-labelledby="work-heading">
+      <div class="section-heading reveal">
+        <div>
+          <p class="eyebrow">Selected works / 01</p>
+          <h2 id="work-heading">一些被留住的时刻<span class="accent">.</span></h2>
+        </div>
+        <p class="muted">人像、风景与品牌故事。<br>每一次按下快门，都是一次认真观看。</p>
+      </div>
+
+      <div class="filter-row">
+        <div class="filters" role="group" aria-label="按作品分类筛选">
+          <button class="filter" type="button" data-filter="all" aria-pressed="true">全部</button>
+          <button class="filter" type="button" data-filter="portrait" aria-pressed="false">人像</button>
+          <button class="filter" type="button" data-filter="landscape" aria-pressed="false">风光</button>
+          <button class="filter" type="button" data-filter="commercial" aria-pressed="false">商业</button>
+        </div>
+        <span class="work-count" id="work-count" role="status"></span>
+      </div>
+
+      <div class="portfolio-grid" id="portfolio-grid"></div>
+      <noscript>
+        <p>请开启 JavaScript，以查看作品、筛选分类及体验预约表单。</p>
+      </noscript>
+      <p class="portfolio-note">演示作品使用 Unsplash 示例摄影；标题与创作故事为虚构 Mock 内容。</p>
+
+      <div id="approach" class="approach reveal" aria-label="拍摄流程">
+        <article>
+          <span class="step-number">01 / BEFORE</span>
+          <h3>先聊聊，再拍摄</h3>
+          <p>从喜欢的电影、日常穿着和想留下的感觉开始，一起找到适合你的拍摄方向。</p>
+        </article>
+        <article>
+          <span class="step-number">02 / DURING</span>
+          <h3>把镜头交给自然</h3>
+          <p>散步、聊天、等待一束光。不需要熟悉镜头，我会给你清晰、轻松的引导。</p>
+        </article>
+        <article>
+          <span class="step-number">03 / AFTER</span>
+          <h3>留下值得回看的照片</h3>
+          <p>保留皮肤的质感、空气的温度。用克制的后期，让照片在几年后依然动人。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section booking-section" id="booking" aria-labelledby="booking-heading">
+      <div class="container booking-grid">
+        <div class="booking-copy reveal">
+          <p class="eyebrow">Make a memory / 02</p>
+          <h2 id="booking-heading">下一段故事，<br>关于你。</h2>
+          <p>一个普通的周末，一场重要的纪念，或者一个正在生长的品牌。把想法写下来，我们从这里开始。</p>
+          <div class="availability">可体验未来 90 天模拟档期</div>
+
+          <div class="service-list" aria-label="示例服务价格">
+            <div class="service-item"><strong>自然人像 / 90 分钟</strong><span>¥1,280 起</span></div>
+            <div class="service-item"><strong>双人纪念 / 120 分钟</strong><span>¥1,980 起</span></div>
+            <div class="service-item"><strong>品牌商业 / 半天</strong><span>¥3,800 起</span></div>
+          </div>
+          <p class="small-note">
+            以上为演示参考价格。实际费用通常需结合地点、造型、交付数量和商业使用范围确认。
+          </p>
+        </div>
+
+        <form class="form-card" id="booking-form" novalidate>
+          <h3>说说你的拍摄计划</h3>
+          <p class="form-intro">
+            这是前端演示。提交内容仅在当前页面处理，不会发送给摄影师；成功提示不代表真实预约。
+          </p>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="customer-name">怎么称呼你 <span class="required">*</span></label>
+              <input id="customer-name" name="customerName" autocomplete="name"
+                     placeholder="你的名字" required minlength="2" maxlength="40"
+                     aria-describedby="customer-name-error">
+              <p class="field-error" id="customer-name-error"></p>
+            </div>
+
+            <div class="field">
+              <label for="customer-phone">联系电话 <span class="required">*</span></label>
+              <input id="customer-phone" name="phone" type="tel" autocomplete="tel"
+                     inputmode="tel" placeholder="手机号或带区号的电话"
+                     required maxlength="30" aria-describedby="customer-phone-error">
+              <p class="field-error" id="customer-phone-error"></p>
+            </div>
+
+            <div class="field full">
+              <label for="customer-email">电子邮箱 <span class="required">*</span></label>
+              <input id="customer-email" name="email" type="email" autocomplete="email"
+                     placeholder="you@example.com" required maxlength="120"
+                     aria-describedby="customer-email-error">
+              <p class="field-error" id="customer-email-error"></p>
+            </div>
+
+            <div class="field full">
+              <label for="service">拍摄类型 <span class="required">*</span></label>
+              <select id="service" name="service" required aria-describedby="service-error">
+                <option value="">请选择拍摄类型</option>
+                <option value="portrait">自然人像 · ¥1,280 起</option>
+                <option value="couple">双人纪念 · ¥1,980 起</option>
+                <option value="commercial">品牌商业 · ¥3,800 起</option>
+              </select>
+              <p class="field-error" id="service-error"></p>
+            </div>
+
+            <div class="field">
+              <label for="booking-date">期望日期 <span class="required">*</span></label>
+              <input id="booking-date" name="date" type="date" required
+                     aria-describedby="date-hint booking-date-error">
+              <p class="field-hint" id="date-hint"></p>
+              <p class="field-error" id="booking-date-error"></p>
+            </div>
+
+            <div class="field">
+              <label for="booking-slot">期望时段 <span class="required">*</span></label>
+              <select id="booking-slot" name="slot" required disabled
+                      aria-describedby="slot-hint booking-slot-error">
+                <option value="">请先选择日期</option>
+              </select>
+              <p class="field-hint" id="slot-hint">模拟排期按杭州时间（UTC+8）。</p>
+              <p class="field-error" id="booking-slot-error"></p>
+            </div>
+
+            <div class="field full">
+              <label for="booking-message">还有什么想告诉我？ <span class="muted">选填</span></label>
+              <textarea id="booking-message" name="message" maxlength="500"
+                        placeholder="喜欢的风格、拍摄地点、特别的纪念日……"
+                        aria-describedby="message-hint"></textarea>
+              <p class="field-hint" id="message-hint">最多 500 字，请勿填写证件或支付信息。</p>
+            </div>
+          </div>
+
+          <label class="consent" for="consent">
+            <input id="consent" type="checkbox" required
+                   aria-describedby="consent-error">
+            <span>我理解这是模拟提交，不会产生真实预约，也不会发送邮件或短信。</span>
+          </label>
+          <p class="field-error" id="consent-error"></p>
+
+          <button class="btn submit-btn" id="booking-submit" type="submit" disabled>
+            提交模拟预约 <span aria-hidden="true">↗</span>
+          </button>
+          <div class="form-result" id="booking-result" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </section>
+
+    <section class="section container" id="stories" aria-labelledby="stories-heading">
+      <div class="section-heading reveal">
+        <div>
+          <p class="eyebrow">Kind words & questions / 03</p>
+          <h2 id="stories-heading">放心，把自己交给镜头。</h2>
+        </div>
+      </div>
+
+      <div class="stories-grid">
+        <div class="accordion-group">
+          <div class="column-title">
+            <h3>拍摄之后，他们说</h3>
+            <span>示例客户评价</span>
+          </div>
+          <details open>
+            <summary>“原来不擅长拍照，也能这么自然。”</summary>
+            <div class="detail-content">
+              <div class="stars" aria-label="5 星评价">★★★★★</div>
+              <blockquote>一开始连手放在哪里都不知道，后来只是沿着街道散步、聊天。收到照片时，最喜欢的竟然是那张没有看镜头的自己。</blockquote>
+              <span class="review-author">林女士 · 自然人像 · Mock 评价</span>
+            </div>
+          </details>
+          <details>
+            <summary>“像我们平时相处的样子。”</summary>
+            <div class="detail-content">
+              <div class="stars" aria-label="5 星评价">★★★★★</div>
+              <blockquote>没有夸张的布置，也没有一遍遍重复的动作。纪念日拍摄最后变成了一次很开心的约会，照片里都是熟悉的小习惯。</blockquote>
+              <span class="review-author">阿哲与小雨 · 双人纪念 · Mock 评价</span>
+            </div>
+          </details>
+          <details>
+            <summary>“终于拍出了店里那种安静的感觉。”</summary>
+            <div class="detail-content">
+              <div class="stars" aria-label="5 星评价">★★★★★</div>
+              <blockquote>从木桌上的光到一杯刚做好的咖啡，画面很克制，却准确地传达了我们的品牌气质。沟通和交付也都很清楚。</blockquote>
+              <span class="review
